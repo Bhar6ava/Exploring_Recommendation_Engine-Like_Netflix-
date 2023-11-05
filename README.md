@@ -21,12 +21,12 @@ What I do with this data? Enter Collaborative Filtering approach, its considered
 
 Collaborative filtering? I will explain - Now i have these couple of my friend's data right, now if I could pair up friends who have similar likes and dislikes, I can recommend content that friend B watched to friend A because they are watching almost same content. This is collaborative and I filter the content data and recommend them. Briefly this is what it is.
 
-So all these data I stored in postgres, scoring them in this format : <br />
-clicked thumbnail? = value '1' <br />
-clicked video? = value '2' <br />
-watched full? = value '4' <br />
-skipped video? = '3' <br />
-closed video? = '2'
+### So all these data I stored in postgres, scoring them in this format : <br />
+### clicked thumbnail? = value '1' <br />
+### clicked video? = value '2' <br />
+### watched full? = value '4' <br />
+### skipped video? = '3' <br />
+### closed video? = '2'
 
 Now I did some math, found patterns and created many pairs of collaborative friends.
 
