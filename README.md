@@ -5,13 +5,15 @@
 
 About this project -
 
-I wanted to understand Recommendation engines used in OTT platforms. So what better than building and learn about it. So, recommendation engines in OTT like Hulu, Netflix generally builds personalized contents(content focusing on that individual's interest); to do this we need to have data of the individual, what the person want to watch,the dislikes, the choices.
+I wanted to understand Recommendation engines used in OTT platforms. So what better than building and learn about it. <br />
+<br />
+So, recommendation engines in OTT like Hulu, Netflix generally builds personalized contents(content focusing on that individual's interest); to do this we need to have data of the individual, what the person want to watch,the dislikes, the choices.
 
 Now the OTT platforms have the user's data, atleast I can assume initially they might not but as the user selects the contents, watches them and searches...all those is valuable data.
 
 So I designed my own architecture to fulfil my purpose
 
-Now in my case, I have little resources, so what did I do? I dint want to download data from kaggle, so I spices things a bit. I build a Netflix like UI (to certain level) asked couple of my friends to click on the movie thumbnails they like and watch trailers...(yeah..i added trailers too) but trailers are copyrighted you know, so I randomly put free videos, and asked some people to watch full video, some to skip them and some to close the videos.
+###Now in my case, I have little resources, so what did I do? I dint want to download data from kaggle, so I spices things a bit. I build a Netflix like UI (to certain level) asked couple of my friends to click on the movie thumbnails they like and watch trailers...(yeah..i added trailers too) but trailers are copyrighted you know, so I randomly put free videos, and asked some friends to watch full video, some to skip them and some to close the videos.
 
 Voila!! got the data and can code to interpret. Now I have these people's choices and dislikes - it is not statistically significant, its a small sample but hey thats good for my prototype.
 
