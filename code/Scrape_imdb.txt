@@ -1,0 +1,63 @@
+import sqlite3
+import os
+import requests
+from bs4 import BeautifulSoup
+
+# Function to scrape and insert movie data into the database
+def scrape_and_insert_movie_data(genre, max_movies=25):
+    # IMDb URL for the specified genre
+    url = f'https://www.imdb.com/search/title/?genres={genre.lower()}&sort=year,desc&title_type=feature'
+
+    # Send an HTTP GET request to IMDb
+    response = requests.get(url)
+
+    # Check if the request was successful (status code 200)
+    if response.status_code == 200:
+        # Parse the HTML content of the page using BeautifulSoup
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # Connect to the database
+        conn = sqlite3.connect('movie_database.db')
+        cursor = conn.cursor()
+
+        # Create a folder to store thumbnail images if it doesn't exist
+        thumbnail_folder = 'thumbnails'
+        os.makedirs(thumbnail_folder, exist_ok=True)
+
+        # Extract movie data and insert it into the database
+        movie_count = 0
+        for movie in soup.find_all(class_='lister-item-content'):
+            title = movie.find('a').text
+            thumbnail_url = movie.find('img')['src']
+            description = movie.find_all('p')[1].text.strip()
+
+            # Define the filename for the image
+            image_filename = f"{title.replace(' ', '_')}.jpg"
+            image_path = os.path.join(thumbnail_folder, image_filename)
+
+            # Download and save the thumbnail image
+            image_response = requests.get(thumbnail_url)
+            if image_response.status_code == 200:
+                with open(image_path, 'wb') as image_file:
+                    image_file.write(image_response.content)
+
+                # Insert movie data into the database with the image path
+                cursor.execute("INSERT INTO movies (title, genre, thumbnail_url, description) VALUES (?, ?, ?, ?)",
+                               (title, genre, image_path, description))
+                conn.commit()
+
+                movie_count += 1
+                if movie_count >= max_movies:
+                    break
+
+        # Close the database connection
+        conn.close()
+    else:
+        print(f'Failed to retrieve data for the {genre} genre.')
+
+# List of genres to scrape
+genres_to_scrape = ['comedy', 'crime', 'action', 'fantasy', 'horror']
+
+# Scrape and insert data for each genre
+for genre in genres_to_scrape:
+    scrape_and_insert_movie_data(genre, max_movies=50)
