@@ -1,4 +1,4 @@
-**Project status : Under correction** <br />
+**Project status : 'Under correction'** <br />
 Expected to be done in a day or two
 
 # Exploring_Recommendation_Engine-Like_Netflix- 
