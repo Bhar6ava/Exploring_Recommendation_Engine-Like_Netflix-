@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendations</title>
+    <!-- Include the movie-trailer package -->
+    <script src="https://unpkg.com/movie-trailer"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Define CSS styles for the entire page */
+        body {
+            background-color: #111;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Highlight entire row in the background for each genre */
+        .genre-row {
+            background-color: #222;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Define CSS styles for movie rows */
+        .movie-container {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            justify-content: space-between;
+        }
+
+        /* Define CSS styles for each movie thumbnail */
+        .movie-thumbnail {
+            flex: 0 0 calc(20% - 10px);
+            margin-right: 10px;
+            text-align: center;
+            background-color: #333;
+            padding: 10px;
+        }
+
+        .thumbnail-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        h2 {
+            font-size: 18px;
+            text-transform: capitalize;
+        }
+
+        .more-content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Movie Recommendations</h1>
+
+    <!-- Loop through movie data and display it grouped by genre -->
+    {% for genre, movies in movie_data.items() %}
+        <div class="genre-row">
+            <h2>{{ genre }}</h2>
+            <!-- Display thumbnail and title -->
+            <div class="movie-container">
+                {% for movie in movies %}
+                    <div class="movie-thumbnail">
+                        <!-- Use url_for to generate the image URL -->
+                        <img src="{{ url_for('static', filename=movie[3]) }}" alt="{{ movie[0] }}" class="thumbnail-image">
+                        <h2>{{ movie[0] }}</h2>
+                        <!-- Add a "More" button -->
+                        <button class="more-button" data-movie="{{ movie[0] }}">More</button>
+                        <!-- Create a container for the additional content -->
+                        <div class="more-content" id="{{ movie[0] }}-content"></div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Include the JavaScript code for enlarging and displaying trailers -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const moreButtons = document.querySelectorAll(".more-button");
+
+            moreButtons.forEach(function (button) {
+                button.addEventListener("click", async function () {
+                    // Retrieve the movie title from the data-movie attribute
+                    const movieTitle = button.dataset.movie;
+
+                    // Find the content container based on the movie title
+                    const contentContainer = document.getElementById(`${movieTitle}-content`);
+
+                    // Toggle the display of the content container
+                    if (contentContainer.style.display === "none" || !contentContainer.style.display) {
+                        try {
+                            // Fetch the description via REST API
+                            const response = await fetch(`/movie/${movieTitle}`);
+                            const data = await response.json();
+
+                            // Populate the content container with the description
+                            contentContainer.innerHTML = `
+                                <p>Description: ${data.description}</p>
+                            `;
+
+                            // Fetch the YouTube trailer link using the movie-trailer module
+                            const youtubeLink = await movieTrailer(movieTitle);
+
+                            // Add a YouTube trailer link with a modal popup
+                            contentContainer.innerHTML += `
+                                <p>
+                                    <a href="${youtubeLink}" class="btn btn-primary" data-toggle="modal" data-target="#trailerModal" onclick="console.log('${youtubeLink}');">
+                                        Watch Trailer
+                                    </a>
+                                </p>
+                            `;
+
+                            contentContainer.style.display = "block";
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    } else {
+                        contentContainer.style.display = "none";
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
