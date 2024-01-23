@@ -34,4 +34,14 @@ Used that data to reflect the same in their UI.
 
 Done!!
 
-I implemented minimal front end because my focus is on recommendation engine.
+I implemented minimal front end because my focus is on recommendation engines.
+
+**The above explanation is to give a high level idea of my project.**
+
+##---> Now let's explore the three algorithms I have created (the design of these algorithms can be present in the internet, but I wanted to come up with ways on my own) -##
+**Recommendation Content Based**
+
+**Recommendation Euclidean Based**
+
+**Recommendation Neural networks Based**
+
