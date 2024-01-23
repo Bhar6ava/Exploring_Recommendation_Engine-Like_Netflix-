@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie/shows</title>
+    <script src="https://unpkg.com/movie-trailer"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        
+        body {
+            background-color: #111;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .genre-row {
+            background-color: #222;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .movie-container {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            justify-content: space-between;
+        }
+
+        .movie-thumbnail {
+            flex: 0 0 calc(20% - 10px);
+            margin-right: 10px;
+            text-align: center;
+            background-color: #333;
+            padding: 10px;
+        }
+
+        .thumbnail-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        h2 {
+            font-size: 18px;
+            text-transform: capitalize;
+        }
+
+        .more-content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Movie/Shows</h1>
+
+    <div class="recommended-movies">
+        <h2>Recommendations</h2>
+        <div class="movie-container">
+            {% for movie in movie_recom %}
+                <div class="movie-thumbnail">
+                    <img src="{{ url_for('static', filename=movie[3]) }}" alt="{{ movie[0] }}" class="thumbnail-image">
+                    <h2>{{ movie[0] }}</h2>
+                    <button class="more-button" data-movie="{{ movie[0] }}">More</button>
+                    <div class="more-content" id="{{ movie[0] }}-content"></div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% for genre, movies in movie_data.items() %}
+        <div class="genre-row">
+            <h2>{{ genre }}</h2>
+            <div class="movie-container">
+                {% for movie in movies %}
+                    <div class="movie-thumbnail">
+                        <img src="{{ url_for('static', filename=movie[3]) }}" alt="{{ movie[0] }}" class="thumbnail-image">
+                        <h2>{{ movie[0] }}</h2>
+                        <button class="more-button" data-movie="{{ movie[0] }}">More</button>
+                        <div class="more-content" id="{{ movie[0] }}-content"></div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+         $(document).ready(function ()  {
+            const moreButtons = document.querySelectorAll(".more-button");
+
+            moreButtons.forEach(function (button) {
+                button.addEventListener("click", async function () {
+                    const movieTitle = button.dataset.movie;
+
+                    const contentContainer = document.getElementById(`${movieTitle}-content`);
+
+                   // const youtubePlayerContainer = document.getElementById(`${movieTitle}-youtube-player`);
+
+                    
+                    
+                    //if (contentContainer.style.display === "none" || !contentContainer.style.display) {
+                        try {
+                            // Fetch the description via REST API
+                            const response = await fetch(`/movie/${movieTitle}`);
+                            const data = await response.json();
+
+                            contentContainer.innerHTML = `
+                                <p>Description: ${data.description}</p>
+                            `;
+
+                        
+                            const youtubeLink = 'https://www.youtube.com/embed/Bn1ror5wRKg'
+                            //console.log(youtubeLink);
+
+                            var player;
+
+                            function onPlayerStateChange(event) {
+                                if (event.data == YT.PlayerState.ENDED) {
+                                
+                                    fetch('http://127.0.0.1:5000/track_click', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({ movieTitle : movieTitle, buttonClicked: 'Watched' , username: "{{ session['username'] }}" })});
+                                }
+                            }
+                            
+
+
+
+                            
+
+
+
+                            
+
+                            //const embedLink = youtubeLink.replace('watch?v=', 'embed/');
+                            //console.log(youtubeLink);
+
+                            fetch('http://127.0.0.1:5000/track_click', {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({ movieTitle : movieTitle, buttonClicked: 'More' , username: "{{ session['username'] }}"}),
+                            })
+                            .then(response => response.json());
+
+
+                            contentContainer.innerHTML += `
+                            <button id="playButton">Play Trailer</button>
+                            <div id="myModal" class="modal">
+                                <div class="modal-content">
+                                    <span class="close">&times;</span>
+                                    <div id="player"></div>
+                                </div>
+                            </div>
+                            `;
+
+                            
+                            
+                            onYouTubeIframeAPIReady();
+
+
+                            function onYouTubeIframeAPIReady() {
+                                console.log('onYouTubeIframeAPIReady is called');
+                                player = new YT.Player('player', {
+                                    height: '560',
+                                    width: '315',
+                                    videoId: 'Bn1ror5wRKg',
+                                    events: {
+                                        'onStateChange': onPlayerStateChange
+                                    }
+                                });
+                            }
+
+                            var modal = document.getElementById("myModal");
+
+                            var btn = document.getElementById("playButton");
+
+                            var span = document.getElementsByClassName("close")[0];
+
+                            btn.onclick = function() {
+
+                            fetch('http://127.0.0.1:5000/track_click', {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({ movieTitle : movieTitle, buttonClicked: 'Play Trailer' , username: "{{ session['username'] }}"}),
+                            })
+                            .then(response => response.json());
+
+                            modal.style.display = "block";
+                            }
+
+                            span.onclick = function() {
+                                modal.style.display = "none";
+                            }
+
+                            window.onclick = function(event) {
+                            if (event.target == modal) {
+                                modal.style.display = "none";
+                                }
+                            }
+
+                            contentContainer.style.display = "block";
+                        
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    
+                });
+            });
+        });
+    </script>
+    
+</body>
+</html>
