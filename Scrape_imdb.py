@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import psycopg2
 import os
 
-# Database connection settings
+
 db_settings = {
     "dbname": "capstone_netflix",
     "user": "postgres",
@@ -11,7 +11,7 @@ db_settings = {
     "host": "localhost"
 }
 
-# Function to insert movie data into the database
+
 def insert_movie_data(movie_data):
     conn = psycopg2.connect(**db_settings)
     cursor = conn.cursor()
@@ -23,7 +23,7 @@ def insert_movie_data(movie_data):
     cursor.close()
     conn.close()
 
-# Function to scrape IMDb data
+
 def scrape_imdb_data(genre, num_movies=25):
     url = f"https://www.imdb.com/search/title/?genres={genre}&sort=num_votes,desc&count={num_movies}"
     response = requests.get(url)
@@ -42,13 +42,15 @@ def scrape_imdb_data(genre, num_movies=25):
             thumbnail_url = img_tag["loadlate"] if img_tag and img_tag.has_attr("loadlate") else "No thumbnail available"
 
 
-        # Download the thumbnail and store it in a folder
-        thumbnail_path = f"thumbnails/{m_name.replace(' ','_')}.jpg"
-        #os.makedirs(os.path.dirname(thumbnail_path), exist_ok=True)
-        #with open(thumbnail_path, "wb") as img_file:
-        #    img_file.write(requests.get(thumbnail_url).content)
 
-        # Prepare movie data
+        print("downloading.....")
+        thumbnail_path = f"thumbnails/{m_name.replace(' ','_')}.jpg"
+        os.makedirs(os.path.dirname(thumbnail_path), exist_ok=True)
+        with open(thumbnail_path, "wb") as img_file:
+            img_file.write(requests.get(thumbnail_url).content)
+
+        
+
         movie_data = {
             "name": m_name,
             "genre": genre,
@@ -62,11 +64,11 @@ def scrape_imdb_data(genre, num_movies=25):
 
 # Example usage:
 if __name__ == "__main__":
-    # Specify genres and the number of movies to scrape
+   
     genres = ["comedy", "action", "fantasy", "crime", "documentary"]
     num_movies_per_genre = 25
 
-    # Scrape and insert data for each genre
+    
     for genre in genres:
         movies = scrape_imdb_data(genre, num_movies_per_genre)
         for movie in movies:
