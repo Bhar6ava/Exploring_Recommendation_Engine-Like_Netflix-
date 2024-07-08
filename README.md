@@ -1,7 +1,7 @@
 # Exploring_Recommendation_Engine-Like_Netflix- 
 
 
-## This is a full stack app with ML. This is a prototype, focusing on Recommendation Engine feature - purpose is to understand end-to-end development; Do not use the code for production!
+## This is a full stack app with ML. This is a prototype, focusing on Recommendation Engine feature - purpose is to understand end-to-end development!
 
 About this project -
 
